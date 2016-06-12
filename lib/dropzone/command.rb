@@ -188,7 +188,7 @@ class DropZoneCommand
     *PAYMENT_ATTRS ) do |privkey, args, params|
     invoice_txid = args[1]  if args.length > 1
 
-    raise OptionParser::MissingArgument, 'invoice_txid' unless invoice_txid
+    raise OptionParser::MissingArgument, 'invoice_txid' unless is_txid?(invoice_txid)
 
     invoice = Dropzone::Invoice.find invoice_txid
 
@@ -210,7 +210,7 @@ class DropZoneCommand
 
     create_txid = args[1]  if args.length > 1
 
-    raise OptionParser::MissingArgument, 'create_txid' unless create_txid
+    raise OptionParser::MissingArgument, 'create_txid' unless is_txid?(create_txid)
 
     params.merge! receiver_addr: privkey.addr, create_txid: create_txid
   end
@@ -284,7 +284,7 @@ class DropZoneCommand
     txid = args[1]  if args.length > 1
     message = args[2]  if args.length > 2
 
-    raise OptionParser::MissingArgument, 'txid' unless txid
+    raise OptionParser::MissingArgument, 'txid' unless is_txid? txid
     raise OptionParser::MissingArgument, 'message' unless message
 
     comm_init = Dropzone::Communication.find txid
@@ -328,7 +328,7 @@ class DropZoneCommand
 
     txid = args[1]  if args.length > 1
 
-    raise OptionParser::MissingArgument, 'txid' unless txid
+    raise OptionParser::MissingArgument, 'txid' unless is_txid? txid
 
     comm_init = Dropzone::Communication.find txid
 
@@ -426,6 +426,10 @@ class DropZoneCommand
   end
 
   private
+
+  def is_txid?(txid)
+    (!!txid) && /\A[a-f0-9]{64}\Z/i.match(txid)
+  end
 
   def local_persistence
     self.class.local_persistence
